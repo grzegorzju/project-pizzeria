@@ -69,7 +69,7 @@
 		  
 		  thisProduct.processOrder();
 		  
-		  console.log('new Product:', thisProduct);
+		  //console.log('new Product:', thisProduct);
 	  }
 	  renderInMenu(){
 		  const thisProduct = this;
@@ -88,6 +88,7 @@
 		  thisProduct.formInputs = thisProduct.form.querySelectorAll(select.all.formInputs);
 		  thisProduct.cartButton = thisProduct.element.querySelector(select.menuProduct.cartButton);
 		  thisProduct.priceElem = thisProduct.element.querySelector(select.menuProduct.priceElem);
+		  thisProduct.imageWrapper = thisProduct.element.querySelector(select.menuProduct.imageWrapper);
 		  
 	  }
 	  initAcordion(){
@@ -126,9 +127,10 @@
 		  const thisProduct = this;
 		  
 		  const formData = utils.serializeFormToObject(thisProduct.form);
-		  console.log('formData', formData);
+		  console.log('thisProduct.data', thisProduct.data);
 		  
 		  let price = thisProduct.data.price;
+		  let images = thisProduct.imageWrapper;
 		  
 		  for(let paramId in thisProduct.data.params){
 			  const param = thisProduct.data.params[paramId];
@@ -136,16 +138,28 @@
 			  
 			  for(let optionId in param.options){
 				  const option = param.options[optionId];
-				  console.log(optionId, option);
+				  //console.log(optionId, option);
 				  if(formData.hasOwnProperty(paramId)){
-					  console.log(formData[paramId]);
-					  console.log(option.label);
+					  //console.log(formData[paramId]);
+					  //console.log(images.children);
+					  //console.log(option.label);
+					  const optionImage = thisProduct.imageWrapper.querySelector("."+paramId+"-"+optionId);
+					  if(optionImage){
+							optionImage.classList.add("active");
+					  }					  
+					  console.log(optionImage);
 					  if(formData[paramId].includes(optionId) && !option.default){
 						  price = price + option.price;
-						  console.log(price);
 					  }
 					  else if(!formData[paramId].includes(optionId) && option.default){
 						  price -= option.price;
+						  if(optionImage){
+							  optionImage.classList.remove("active");
+						  }					  }
+					  else if(!formData[paramId].includes(optionId) && !option.default){
+						  if(optionImage){
+							  optionImage.classList.remove("active");
+						  }
 					  }
 				  }
 			  }
