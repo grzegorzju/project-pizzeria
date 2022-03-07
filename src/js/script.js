@@ -64,12 +64,26 @@
 		  console.log('AmountWidget:', thisWidget);
 		  console.log('constructor arguments:', element);
 	  }
+	  announce(){
+		  const thisWidget = this;
+		  
+		  const event = new Event('updated');
+		  thisWidget.element.dispatchEvent(event);
+	  }
 	  initActions(){
 		  const thisWidget = this;
 		  
-		  thisWidget.input.addEventListener('change',thisWidget.setValue);
-		  thisWidget.linkDecrease.addEventListener('click',function(){event.preventDefault();thisWidget.setValue(thisWidget.value);});
-		  thisWidget.linkIncrease.addEventListener('click',function(){event.preventDefault();thisWidget.setValue(thisWidget.value);});
+		  thisWidget.input.addEventListener('change',function(){thisWidget.setValue(thisWidget.input.value);});
+		  thisWidget.linkDecrease.addEventListener('click',function(){
+																	event.preventDefault();
+																	let decreasedValue = thisWidget.value-1;
+																	thisWidget.setValue(decreasedValue);
+																	});
+		  thisWidget.linkIncrease.addEventListener('click',function(){
+																	event.preventDefault();
+																	let incresedValue = thisWidget.value+1;
+																	thisWidget.setValue(incresedValue);
+																	});
 	  }
 	  getElements(element){
 		  const thisWidget = this;
@@ -78,20 +92,24 @@
 		  thisWidget.input = thisWidget.element.querySelector(select.widgets.amount.input);
 		  thisWidget.linkDecrease = thisWidget.element.querySelector(select.widgets.amount.linkDecrease);
 		  thisWidget.linkIncrease = thisWidget.element.querySelector(select.widgets.amount.linkIncrease);
+		  console.log("thisWidget",thisWidget.input);
+		  console.log("select.widgets.amount.input",select.widgets.amount.input);
 	  }
 	  setValue(value){
 		  const thisWidget = this;
 		  
 		  const newValue = parseInt(value);
 		  
-		  console.log("new value:",newValue);
-		  console.log(thisWidget.value);
-		  console.log(thisWidget);
+		  //console.log("new value:",newValue);
+		  //console.log(thisWidget.value);
+		  //console.log(thisWidget);
 		  
-		  if(thisWidget.value !== newValue && !isNaN(newValue)){
+		  if(thisWidget.value !== newValue && !isNaN(newValue) && newValue > 0 && newValue <= 10){
 			thisWidget.value = newValue;
-			thisWidget.input.value = thisWidget.value;
+			
 		  }
+		  thisWidget.input.value = thisWidget.value;
+		  thisWidget.announce();
 	  }
   }
   
@@ -173,6 +191,7 @@
 		  const thisProduct = this;
 		  
 		  thisProduct.amountWidget = new AmountWidget(thisProduct.amountWidgetElem);
+		  thisProduct.amountWidgetElem.addEventListener('updated',function(){thisProduct.processOrder()});
 	  }
 	  processOrder(){
 		  const thisProduct = this;
@@ -208,7 +227,7 @@
 				  }
 			  }
 		  }
-		  
+		  price *= thisProduct.amountWidget.value;
 		  thisProduct.priceElem.innerHTML = price;
 	  }
   }
